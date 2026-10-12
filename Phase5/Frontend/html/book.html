@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment - ClinicBook</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="../index.html">ClinicBook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="book.html">Book Appointment</a></li>
+                    <li class="nav-item"><a class="nav-link" href="appointments.html">My Appointments</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">More</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="doctors.html">Our Doctors</a></li>
+                            <li><a class="dropdown-item" href="admin.html">Admin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FORM SECTION -->
+    <div class="container my-5">
+        <h3 class="fw-bold mb-4">Book an Appointment</h3>
+
+        <!-- ALERT BOX -->
+        <div id="alertBox" class="alert d-none" role="alert"></div>
+
+        <div class="row">
+            <!-- PATIENT INFORMATION -->
+            <div class="col-md-6 mb-3">
+                <div class="form-box p-4 border bg-light">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">Patient Information</h5>
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label fw-bold">Full Name</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Enter full name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label fw-bold">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label fw-bold">Phone</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="Enter phone number">
+                    </div>
+                </div>
+            </div>
+
+            <!-- APPOINTMENT DETAILS -->
+            <div class="col-md-6 mb-3">
+                <div class="form-box p-4 border bg-light">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom">Appointment Details</h5>
+                    <div class="mb-3">
+                        <label for="doctor" class="form-label fw-bold">Choose Doctor</label>
+                        <select class="form-select" id="doctor">
+                            <option value="">Loading doctors...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date" class="form-label fw-bold">Date</label>
+                        <input type="date" class="form-control" id="date">
+                    </div>
+                    <div class="mb-3">
+                        <label for="time" class="form-label fw-bold">Time</label>
+                        <select class="form-select" id="time">
+                            <option value="">Select time slot</option>
+                            <option value="09:00:00">9:00 AM</option>
+                            <option value="10:00:00">10:00 AM</option>
+                            <option value="11:00:00">11:00 AM</option>
+                            <option value="14:00:00">2:00 PM</option>
+                            <option value="15:00:00">3:00 PM</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label fw-bold">Notes (optional)</label>
+                        <textarea class="form-control" id="notes" rows="3" placeholder="Write any notes here"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <div class="text-center mt-4">
+            <button id="submitBtn" class="btn btn-success btn-lg px-5">Submit Booking</button>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <p class="mb-0">2025 ClinicBook</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/script.js"></script>
+
+    <script>
+        // Load doctors from database into dropdown
+        async function loadDoctors() {
+            const result = await API.get('/data/doctors');
+            const select = document.getElementById('doctor');
+            select.innerHTML = '<option value="">Select a doctor</option>';
+
+            if (result && result.success) {
+                result.data.forEach(doctor => {
+                    select.innerHTML += `<option value="${doctor.doctor_id}">${doctor.doctor_name} - ${doctor.specialization}</option>`;
+                });
+            } else {
+                select.innerHTML = '<option value="">Failed to load doctors</option>';
+            }
+        }
+
+        // Submit booking
+        document.getElementById('submitBtn').addEventListener('click', async function () {
+            const fullName = document.getElementById('fullName').value.trim();
+            const email    = document.getElementById('email').value.trim();
+            const phone    = document.getElementById('phone').value.trim();
+            const doctorId = document.getElementById('doctor').value;
+            const date     = document.getElementById('date').value;
+            const time     = document.getElementById('time').value;
+            const notes    = document.getElementById('notes').value.trim();
+
+            // Validation
+            if (!fullName || !email || !phone || !doctorId || !date || !time) {
+                showAlert('Please fill in all required fields.', 'danger');
+                return;
+            }
+
+            // Step 1: Add patient
+            const patientResult = await API.post('/data/patient', {
+                full_name: fullName,
+                email: email,
+                phone: phone
+            });
+
+            if (!patientResult || !patientResult.success) {
+                showAlert('Error saving patient info. Email may already exist.', 'danger');
+                return;
+            }
+
+            const patientId = patientResult.patient_id;
+
+            // Step 2: Book appointment
+            const apptResult = await API.post('/data/appointment', {
+                patient_id: patientId,
+                doctor_id: doctorId,
+                appointment_date: date,
+                appointment_time: time,
+                notes: notes
+            });
+
+            if (apptResult && apptResult.success) {
+                // Save details for confirmation page
+                localStorage.setItem('lastAppointment', JSON.stringify({
+                    doctorId: doctorId,
+                    doctorName: document.getElementById('doctor').options[document.getElementById('doctor').selectedIndex].text,
+                    date: date,
+                    time: time
+                }));
+                window.location.href = 'confirmation.html';
+            } else {
+                showAlert('Error booking appointment. Please try again.', 'danger');
+            }
+        });
+
+        function showAlert(message, type) {
+            const box = document.getElementById('alertBox');
+            box.className = `alert alert-${type}`;
+            box.textContent = message;
+            box.classList.remove('d-none');
+        }
+
+        // Load doctors when page opens
+        loadDoctors();
+    </script>
+</body>
+</html>

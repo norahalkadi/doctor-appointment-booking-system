@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - ClinicBook</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="../index.html">ClinicBook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="book.html">Book Appointment</a></li>
+                    <li class="nav-item"><a class="nav-link" href="appointments.html">My Appointments</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">More</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="doctors.html">Our Doctors</a></li>
+                            <li><a class="dropdown-item active" href="admin.html">Admin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    
+    <div class="container-fluid my-4">
+        <div class="row">
+
+            <!-- SIDEBAR -->
+            <div class="col-md-2 bg-dark text-light p-0">
+                <div class="sidebar-admin">
+                    <div class="p-3 border-bottom border-secondary">
+                        <h5 class="fw-bold mb-0">Admin</h5>
+                    </div>
+                    <div class="sidebar-link-admin active">Dashboard</div>
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="col-md-10">
+                <div class="p-4">
+                    <h3 class="fw-bold mb-4">Admin Dashboard</h3>
+
+                    <!-- STATS ROW -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card border bg-light p-3 text-center">
+                                <div class="stat-num" id="statAppointments">—</div>
+                                <div class="stat-label">Appointments</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card border bg-light p-3 text-center">
+                                <div class="stat-num" id="statDoctors">—</div>
+                                <div class="stat-label">Doctors</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card border bg-light p-3 text-center">
+                                <div class="stat-num" id="statPatients">—</div>
+                                <div class="stat-label">Patients</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card border bg-light p-3 text-center">
+                                <div class="stat-num" id="statConfirmed">—</div>
+                                <div class="stat-label">Confirmed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FEATURE 3: SEARCH BAR for appointments -->
+                    <div class="mb-3">
+                        <input type="text" id="adminSearchInput" class="form-control"
+                            placeholder="Search appointments by patient or doctor name...">
+                    </div>
+
+                    <!-- ALL APPOINTMENTS TABLE -->
+                    <div class="table-responsive border mb-4">
+                        <div class="bg-secondary text-white p-3">
+                            <span class="fw-bold">All Appointments</span>
+                            <span class="ms-2 text-white-50" id="adminResultsCount"></span>
+                        </div>
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Patient</th>
+                                    <th>Doctor</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTableBody">
+                                <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- ADD DOCTOR FORM -->
+                    <h5 class="fw-bold text-uppercase text-muted mb-3">Doctors in System</h5>
+                    <div class="border p-3 mb-3 bg-light">
+                        <h6 class="fw-bold mb-3">Add New Doctor</h6>
+                        <div class="row g-2">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="newDoctorName" placeholder="Doctor Name">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="newDoctorSpec" placeholder="Specialization">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="newDoctorDays" placeholder="Available Days (e.g. Mon, Wed)">
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-success w-100" onclick="addDoctor()">+ Add Doctor</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DOCTORS TABLE -->
+                    <div class="table-responsive border">
+                        <div class="bg-secondary text-white p-3">
+                            <span class="fw-bold">Doctors List</span>
+                        </div>
+                        <table class="table table-striped table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Specialization</th>
+                                    <th>Available Days</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctorsTableBody">
+                                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <p class="mb-0">2025 ClinicBook</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/script.js"></script>
+    <script>
+        let allAdminAppointments = [];
+
+        async function loadAll() {
+            showLoading(true); // FEATURE 2: spinner ON
+            await loadAppointments();
+            await loadDoctors();
+            await loadPatients();
+            showLoading(false); // FEATURE 2: spinner OFF
+            showAlert('Dashboard loaded successfully!', 'success'); // FEATURE 1
+        }
+
+        // Load appointments
+        async function loadAppointments() {
+            const result = await API.get('/data/appointments');
+            const tbody = document.getElementById('appointmentsTableBody');
+
+            if (result && result.success) {
+                allAdminAppointments = result.data;
+                document.getElementById('statAppointments').textContent = result.data.length;
+                const confirmed = result.data.filter(a => a.status === 'Confirmed').length;
+                document.getElementById('statConfirmed').textContent = confirmed;
+                renderAdminAppointments(allAdminAppointments);
+            } else {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No appointments.</td></tr>';
+            }
+        }
+
+        function renderAdminAppointments(appointments) {
+            const tbody = document.getElementById('appointmentsTableBody');
+            document.getElementById('adminResultsCount').textContent = `(${appointments.length} records)`;
+
+            if (appointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No matching appointments.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            appointments.forEach((appt, index) => {
+                const date = new Date(appt.appointment_date).toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                const statusBadge = appt.status === 'Confirmed'
+                    ? '<span class="badge bg-success">Confirmed</span>'
+                    : appt.status === 'Pending'
+                    ? '<span class="badge bg-secondary">Pending</span>'
+                    : '<span class="badge bg-danger">Cancelled</span>';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${appt.patient_name}</td>
+                        <td>${appt.doctor_name}</td>
+                        <td>${date}</td>
+                        <td>${statusBadge}</td>
+                        <td>${appt.notes || '—'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAppointment(${appt.appointment_id})">Delete</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        // Load doctors
+        async function loadDoctors() {
+            const result = await API.get('/data/doctors');
+            const tbody = document.getElementById('doctorsTableBody');
+
+            if (result && result.success) {
+                document.getElementById('statDoctors').textContent = result.data.length;
+                tbody.innerHTML = '';
+                result.data.forEach((doc, index) => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${doc.doctor_name}</td>
+                            <td>${doc.specialization}</td>
+                            <td>${doc.available_days}</td>
+                            <td><button class="btn btn-sm btn-danger" onclick="deleteDoctor(${doc.doctor_id})">Remove</button></td>
+                        </tr>`;
+                });
+            }
+        }
+
+        // Load patients count
+        async function loadPatients() {
+            const result = await API.get('/data/patients');
+            if (result && result.success) {
+                document.getElementById('statPatients').textContent = result.data.length;
+            }
+        }
+
+        // Delete appointment
+        async function deleteAppointment(id) {
+            if (!confirm('Delete this appointment?')) return;
+            showLoading(true); // FEATURE 2
+            const result = await API.delete(`/data/appointment/${id}`);
+            showLoading(false); // FEATURE 2
+            if (result && result.success) {
+                showAlert('Appointment deleted successfully!', 'success'); // FEATURE 1
+                loadAppointments();
+            } else {
+                showAlert('Error deleting appointment.', 'danger'); // FEATURE 1
+            }
+        }
+
+        // Delete doctor
+        async function deleteDoctor(id) {
+            if (!confirm('Remove this doctor? All their appointments will also be deleted.')) return;
+            showLoading(true); // FEATURE 2
+            const result = await API.delete(`/data/doctor/${id}`);
+            showLoading(false); // FEATURE 2
+            if (result && result.success) {
+                showAlert('Doctor removed successfully!', 'success'); // FEATURE 1
+                loadAll();
+            } else {
+                showAlert('Error removing doctor.', 'danger'); // FEATURE 1
+            }
+        }
+
+        // Add new doctor
+        async function addDoctor() {
+            const name = document.getElementById('newDoctorName').value.trim();
+            const spec = document.getElementById('newDoctorSpec').value.trim();
+            const days = document.getElementById('newDoctorDays').value.trim();
+
+            if (!name || !spec || !days) {
+                showAlert('Please fill in all doctor fields.', 'warning'); // FEATURE 1
+                return;
+            }
+
+            showLoading(true); // FEATURE 2
+            const result = await API.post('/data/doctor', {
+                doctor_name: name,
+                specialization: spec,
+                available_days: days
+            });
+            showLoading(false); // FEATURE 2
+
+            if (result && result.success) {
+                showAlert('Doctor added successfully!', 'success'); // FEATURE 1
+                document.getElementById('newDoctorName').value = '';
+                document.getElementById('newDoctorSpec').value = '';
+                document.getElementById('newDoctorDays').value = '';
+                loadDoctors();
+            } else {
+                showAlert('Error adding doctor.', 'danger'); 
+            }
+        }
+
+       
+        document.getElementById('adminSearchInput').addEventListener('input', function () {
+            const term = this.value.toLowerCase();
+            const filtered = allAdminAppointments.filter(appt =>
+                appt.patient_name.toLowerCase().includes(term) ||
+                appt.doctor_name.toLowerCase().includes(term)
+            );
+            renderAdminAppointments(filtered);
+        });
+
+        loadAll();
+    </script>
+</body>
+</html>

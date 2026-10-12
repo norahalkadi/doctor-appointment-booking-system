@@ -1,0 +1,208 @@
+
+
+/* ---- GENERAL ---- */
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+
+/* ---- PREVENT HORIZONTAL SCROLL (Dropdown Fix) ---- */
+.dropdown-menu {
+    right: 0;
+    left: auto;
+}
+
+/* ---- HERO SECTION (Jumbotron style) ---- */
+.hero-section {
+    background-color: #e0e0e0;
+    border: 1px solid #bbb;
+    padding: 50px 20px;
+}
+
+/* ---- CAROUSEL STYLING ---- */
+.carousel-box {
+    background-color: #ddd;
+    border: 1px solid #bbb;
+    padding: 60px 20px;
+    text-align: center;
+    min-height: 200px;
+}
+
+.carousel-box h3 {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.carousel-box p {
+    font-size: 14px;
+    color: #555;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: #555;
+    border-radius: 50%;
+    padding: 10px;
+}
+
+/* ---- INFO CARDS ---- */
+.info-card {
+    border: 1px solid #bbb;
+    background-color: #f5f5f5;
+    transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-icon-box {
+    width: 50px;
+    height: 50px;
+    background-color: #ccc;
+    border: 1px solid #aaa;
+    margin: 0 auto 15px;
+}
+
+/* ---- CSS ANIMATION (Requirement) ---- */
+/* Fade-in animation for cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.info-card {
+    animation: fadeInUp 0.6s ease;
+}
+
+.info-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.info-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.info-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* Button hover animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.btn:hover {
+    animation: pulse 0.5s ease;
+}
+
+/* ---- FORM BOXES ---- */
+.form-box {
+    background-color: #fafafa;
+}
+
+/* ---- SUCCESS BOX (Confirmation) ---- */
+.success-box-container {
+    background-color: #f5f5f5;
+}
+
+.big-icon-box {
+    width: 60px;
+    height: 60px;
+    background-color: #bbb;
+    border: 1px solid #999;
+}
+
+.confirm-detail-box {
+    font-size: 14px;
+}
+
+/* ---- ADMIN SIDEBAR ---- */
+.sidebar-admin {
+    min-height: 600px;
+}
+
+.sidebar-link-admin {
+    padding: 12px 20px;
+    color: #ccc;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sidebar-link-admin:hover {
+    background-color: #555;
+}
+
+.sidebar-link-admin.active {
+    background-color: #777;
+    color: white;
+}
+
+/* ---- STAT CARDS (Admin) ---- */
+.stat-card {
+    background-color: #f5f5f5;
+}
+
+.stat-num {
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* ---- TABLE STYLING ---- */
+.table-responsive {
+    background-color: white;
+}
+
+/* ---- BADGES ---- */
+.badge {
+    font-size: 11px;
+    padding: 4px 10px;
+}
+
+/* ---- FOOTER ---- */
+footer {
+    margin-top: 50px;
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 30px 15px;
+    }
+    
+    .carousel-box {
+        padding: 40px 15px;
+        min-height: 150px;
+    }
+    
+    .stat-card {
+        margin-bottom: 15px;
+    }
+}

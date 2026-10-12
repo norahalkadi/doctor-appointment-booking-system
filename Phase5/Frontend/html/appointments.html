@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Appointments - ClinicBook</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="../index.html">ClinicBook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="book.html">Book Appointment</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="appointments.html">My Appointments</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">More</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="doctors.html">Our Doctors</a></li>
+                            <li><a class="dropdown-item" href="admin.html">Admin</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MY APPOINTMENTS SECTION -->
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold">My Appointments</h3>
+            <a href="book.html" class="btn btn-secondary">+ Book New</a>
+        </div>
+
+        <!-- FEATURE 3: SEARCH BAR + STATUS FILTER (from lecture slides) -->
+        <div class="row mb-3 g-2">
+            <div class="col-md-6">
+                <input type="text" id="searchInput" class="form-control"
+                    placeholder="Search by patient name or doctor name...">
+            </div>
+            <div class="col-md-3">
+                <select id="statusFilter" class="form-select">
+                    <option value="all">All Statuses</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100" onclick="resetFilters()">Reset Filters</button>
+            </div>
+        </div>
+
+        <!-- RESULTS COUNT -->
+        <p class="text-muted mb-2" id="resultsCount"></p>
+
+        <!-- TABLE -->
+        <div class="table-responsive border">
+            <div class="bg-secondary text-white p-3">
+                <span class="fw-bold">Your Bookings</span>
+            </div>
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentsTableBody">
+                    <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-light text-center py-3 mt-5">
+        <p class="mb-0">2025 ClinicBook</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/script.js"></script>
+    <script>
+        let allAppointments = [];
+
+        // Load all appointments from database
+        async function loadAppointments() {
+            showLoading(true); // FEATURE 2: spinner ON
+            const result = await API.get('/data/appointments');
+            showLoading(false); // FEATURE 2: spinner OFF
+
+            if (result && result.success && result.data.length > 0) {
+                allAppointments = result.data;
+                renderTable(allAppointments);
+                showAlert('Appointments loaded successfully!', 'success'); // FEATURE 1
+            } else {
+                document.getElementById('appointmentsTableBody').innerHTML =
+                    '<tr><td colspan="7" class="text-center text-muted">No appointments found.</td></tr>';
+            }
+        }
+
+        // Render table rows
+        function renderTable(appointments) {
+            const tbody = document.getElementById('appointmentsTableBody');
+            document.getElementById('resultsCount').textContent =
+                `Showing ${appointments.length} appointment(s)`;
+
+            if (appointments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No matching appointments.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            appointments.forEach((appt, index) => {
+                const statusBadge = getStatusBadge(appt.status);
+                const date = new Date(appt.appointment_date).toLocaleDateString('en-GB', {
+                    day: '2-digit', month: 'short', year: 'numeric'
+                });
+                const time = appt.appointment_time.substring(0, 5);
+
+                const actions = appt.status !== 'Cancelled'
+                    ? `<button class="btn btn-sm btn-danger" onclick="cancelAppointment(${appt.appointment_id})">Cancel</button>`
+                    : '—';
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${appt.patient_name}</td>
+                        <td>${appt.doctor_name}</td>
+                        <td>${date}</td>
+                        <td>${time}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actions}</td>
+                    </tr>`;
+            });
+        }
+
+        // Cancel an appointment
+        async function cancelAppointment(id) {
+            if (!confirm('Are you sure you want to cancel this appointment?')) return;
+
+            showLoading(true); // FEATURE 2
+            const result = await API.delete(`/data/appointment/${id}`);
+            showLoading(false); // FEATURE 2
+
+            if (result && result.success) {
+                showAlert('Appointment cancelled successfully.', 'success'); // FEATURE 1
+                loadAppointments();
+            } else {
+                showAlert('Error cancelling appointment.', 'danger'); // FEATURE 1
+            }
+        }
+
+        // Status badge colors
+        function getStatusBadge(status) {
+            if (status === 'Confirmed') return '<span class="badge bg-success">Confirmed</span>';
+            if (status === 'Pending')   return '<span class="badge bg-secondary">Pending</span>';
+            return '<span class="badge bg-danger">Cancelled</span>';
+        }
+
+        // FEATURE 3: Filter appointments by search + status
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            const filtered = allAppointments.filter(appt => {
+                const matchesSearch =
+                    appt.patient_name.toLowerCase().includes(searchTerm) ||
+                    appt.doctor_name.toLowerCase().includes(searchTerm);
+
+                const matchesStatus =
+                    statusFilter === 'all' || appt.status === statusFilter;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            renderTable(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = 'all';
+            renderTable(allAppointments);
+        }
+
+        // Listen for search and filter changes
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        loadAppointments();
+    </script>
+</body>
+</html>
